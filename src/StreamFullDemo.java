@@ -21,8 +21,6 @@
  */
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -37,6 +35,7 @@ public class StreamFullDemo {
         demonstrateTerminalOperations();
         demonstratePrimitiveStreams();
         demonstrateSpecialMethods();
+        demonstrateCollectorsMethods();
     }
 
     /*
@@ -210,4 +209,98 @@ public class StreamFullDemo {
                 .onClose(() -> System.out.println("Stream closed"))
                 .close();
     }
+
+    /*
+     * ==============================
+     * 6️⃣ COLLECTORS INBUILT METHODS
+     * ==============================
+     */
+    public static void demonstrateCollectorsMethods() {
+
+        List<String> names = List.of("Ram", "Shyam", "Ram", "Mohan", "Sita", "Gita");
+
+        // 1️⃣ toList()
+        List<String> nameList =
+                names.stream().collect(Collectors.toList());
+
+        // 2️⃣ toSet() → removes duplicates
+        Set<String> nameSet =
+                names.stream().collect(Collectors.toSet());
+
+        // 3️⃣ joining() → real-world: CSV creation / logging
+        String joinedNames =
+                names.stream().collect(Collectors.joining(", "));
+        System.out.println("Joined Names: " + joinedNames);
+
+        // 4️⃣ counting() → real-world: analytics
+        long totalNames =
+                names.stream().collect(Collectors.counting());
+        System.out.println("Total Count: " + totalNames);
+
+        // 5️⃣ groupingBy() → real-world: frequency / reporting
+        Map<String, Long> frequencyMap =
+                names.stream().collect(
+                        Collectors.groupingBy(
+                                Function.identity(),
+                                Collectors.counting()
+                        )
+                );
+        System.out.println("Frequency Map: " + frequencyMap);
+
+        // 6️⃣ mapping() → transform grouped values
+        Map<Integer, List<String>> lengthGrouped =
+                names.stream().collect(
+                        Collectors.groupingBy(
+                                String::length,
+                                Collectors.mapping(
+                                        String::toUpperCase,
+                                        Collectors.toList()
+                                )
+                        )
+                );
+        System.out.println("Grouped by Length: " + lengthGrouped);
+
+        // 7️⃣ partitioningBy() → real-world: filter TRUE/FALSE buckets
+        Map<Boolean, List<String>> partitioned =
+                names.stream().collect(
+                        Collectors.partitioningBy(name -> name.length() > 4)
+                );
+        System.out.println("Partitioned Map: " + partitioned);
+
+        // 8️⃣ summarizingInt() → real-world: statistics dashboard
+        IntSummaryStatistics stats =
+                names.stream().collect(
+                        Collectors.summarizingInt(String::length)
+                );
+        System.out.println("Statistics: " + stats);
+
+        // 9️⃣ averagingInt()
+        double avgLength =
+                names.stream().collect(
+                        Collectors.averagingInt(String::length)
+                );
+        System.out.println("Average Length: " + avgLength);
+
+        // 🔟 collectingAndThen() → post-processing result
+        List<String> unmodifiableList =
+                names.stream().collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                Collections::unmodifiableList
+                        )
+                );
+        System.out.println("Unmodifiable List: " + unmodifiableList);
+
+        // 1️⃣1️⃣ toMap() → real-world: ID → Name mapping
+        Map<Integer, String> idNameMap =
+                IntStream.range(0, names.size())
+                        .boxed()
+                        .collect(Collectors.toMap(
+                                i -> i + 1,
+                                names::get,
+                                (oldVal, newVal) -> newVal
+                        ));
+        System.out.println("ID → Name Map: " + idNameMap);
+    }
+
 }
