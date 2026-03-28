@@ -10,6 +10,8 @@ public class Pattern1 {
                 "apple", "banana", "apple", "orange", "banana", "kiwi"
         );
 
+        List<Object> input = Arrays.asList("A", "B", "C", "1", "2", "3", "4", 1, 2, 3, "a", "b");
+
         // 🔥 STEP 1 — Create Frequency Map
         Map<String, Long> freqMap = list.stream()
                 .collect(Collectors.groupingBy(
@@ -44,5 +46,24 @@ public class Pattern1 {
                 .orElse(null);
 
         System.out.println("First Non-Repeating Element: " + firstNonRepeating);
+
+
+        // 4. Find the Unique elements (case-insensitive)
+        List<Object> result = Collections.singletonList(input.stream()
+                .map(obj -> {
+                    if (obj instanceof String) {
+                        return ((String) obj).toLowerCase(); // case-insensitive
+                    } else {
+                        return String.valueOf(obj); // convert numbers to string
+                    }
+                })
+                .collect(Collectors.groupingBy(Function.identity(), LinkedHashMap::new, Collectors.counting()))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue() == 1)
+                .map(Map.Entry::getKey)
+                .toList());
+
+        System.out.println("Unique Element: " + result);
     }
+
 }
