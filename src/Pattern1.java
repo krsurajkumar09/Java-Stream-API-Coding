@@ -30,7 +30,8 @@ public class Pattern1 {
         List<String> unique = freqMap.entrySet().stream()
                 .filter(entry -> entry.getValue() == 1)
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+//                .collect(Collectors.toList());
+                .toList();
 
         System.out.println("Unique Elements: " + unique);
 
@@ -53,21 +54,19 @@ public class Pattern1 {
 
 
         // 4. Find the Unique elements (case-insensitive)
-        List<Object> result = Collections.singletonList(input.stream()
+        List<Object> result = input.stream()
                 .map(obj -> {
-                    if (obj instanceof String) {
-                        return ((String) obj).toLowerCase(); // case-insensitive
-                    } else {
-                        return String.valueOf(obj); // convert numbers to string
-                    }
+                    if (obj instanceof String s) return s.toLowerCase();
+                    if (obj instanceof Number n) return String.valueOf(n);
+                    return obj; // required
                 })
-                .collect(Collectors.groupingBy(Function.identity(), LinkedHashMap::new, Collectors.counting()))
+                .collect(Collectors.groupingBy( element -> element, LinkedHashMap::new, Collectors.counting()))
                 .entrySet().stream()
                 .filter(entry -> entry.getValue() == 1)
                 .map(Map.Entry::getKey)
-                .toList());
+                .toList();
 
-        System.out.println("Unique Element: " + result);
+        System.out.println("Unique Element of Interview: " + result);
 
 
 //        Question: Input: ["apple", "banana", "apple", "orange", "banana", "kiwi"]
