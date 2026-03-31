@@ -5,6 +5,20 @@ public class Pattern2 {
 
     public static void main(String[] args) {
 
+
+//        For below Questions, I need to understand which function to use and why, Provide the answer which is easier to execute in Interview.
+//
+//
+//        1.Sort all the Employee on the basis of Salary.
+//
+//        2.Sort all the employee on the basis of Salary per department.
+//
+//        3.Find the Employee with highest Salary per department. (a. Show all details of Employee   b. Show only Name)
+//
+//        4.Find the top 2 Salaried employee per department.
+//
+//        5.Find the 2nd highest salary per department.
+
         List<Student> StudentList = new ArrayList<>();
 
         StudentList.add(new Student(1, "Ram"));
