@@ -1,17 +1,7 @@
 import java.util.*;
 import java.util.stream.*;
 
-class Employee {
-    int id;
-    String name;
-    int salary;
 
-    Employee(int id, String name, int salary) {
-        this.id = id;
-        this.name = name;
-        this.salary = salary;
-    }
-}
 
 public class StreamReductionDemo {
 
@@ -52,13 +42,13 @@ public class StreamReductionDemo {
         // Object Example
         // -------------------------------
         List<Employee> employees = Arrays.asList(
-                new Employee(1, "Ram", 50000),
-                new Employee(2, "Shyam", 60000),
-                new Employee(3, "Ramesh", 70000)
+                new Employee("Ram", "IT", 50000),
+                new Employee("Shyam", "HR", 40000),
+                new Employee("Mohan", "Finance", 60000)
         );
 
         int totalSalary = employees.stream()
-                .map(emp -> emp.salary)
+                .map(emp -> emp.getSalary())
                 .reduce(0, Integer::sum);
 
         System.out.println("Total Salary: " + totalSalary);
