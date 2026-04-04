@@ -24,14 +24,14 @@ public class StreamStringManipulation {
 
 
         // ===== CASE 2: Sentence cleaning =====
-        String dirtySentence = "       ........  This is a       #####^&%^%$*&%^&$&%        clever         fo        x    , s         o, beware$#%^.     ::::::;;;;;;;%$^&^&^&&%&%%    ,                   ";
+        String dirtySentence = "       ........  This is a       #####^&%^%$*&%^&$&%        clever       fox    , s   o, beware$#%^.     ::::::;;;;;;;%$^&^&^&&%&%%    ,                   ";
 
         String cleanSentence = cleanSentenceStream(dirtySentence);
         System.out.println("Final Output (Sentence): " + cleanSentence);
     }
 
 
-    // ✅ EXISTING FUNCTION (unchanged)
+    // ✅ ARRAY CLEANING (STREAM)
     public static String cleanAndMerge(String[] input) {
         return Arrays.stream(input)
                 .filter(Objects::nonNull)
@@ -42,10 +42,10 @@ public class StreamStringManipulation {
     }
 
 
-    // 🔥 NEW STREAM FUNCTION ADDED
+    // 🔥 SENTENCE CLEANING (STREAM + SMART PARSING)
     public static String cleanSentenceStream(String input) {
 
-        // Step 1: Keep valid characters
+        // Step 1: Keep only valid characters
         String cleaned = input.chars()
                 .mapToObj(c -> (char) c)
                 .filter(c -> Character.isLetter(c) || c == ' ' || c == ',' || c == '.')
@@ -55,37 +55,73 @@ public class StreamStringManipulation {
         // Step 2: Normalize spaces
         cleaned = cleaned.replaceAll("\\s+", " ").trim();
 
-        // ✅ Step 3: Remove leading/trailing dots & commas
-        cleaned = cleaned.replaceAll("^[,\\.]+", "");   // start
-        cleaned = cleaned.replaceAll("[,\\.]+$", "");   // end
+        // Step 3: Remove leading/trailing punctuation
+        cleaned = cleaned.replaceAll("^[,.]+", "");
+        cleaned = cleaned.replaceAll("[,.]+$", "");
 
-        // ✅ Step 4: Fix broken words (better approach)
-        // merge sequences like "f o x" → "fox"
-        cleaned = cleaned.replaceAll("\\b([a-zA-Z])(?:\\s+([a-zA-Z]))+\\b", match -> {
-            return match.group().replaceAll("\\s+", "");
-        });
+        // 🔥 Step 4: Separate punctuation properly
+        cleaned = cleaned.replaceAll("([,.])", " $1 ");
+        cleaned = cleaned.replaceAll("\\s+", " ").trim();
 
-        // fallback (for Java 8 compatibility)
-        for (int i = 0; i < 3; i++) {
-            cleaned = cleaned.replaceAll("\\b([a-zA-Z])\\s+([a-zA-Z])\\b", "$1$2");
+        String[] tokens = cleaned.split(" ");
+
+        StringBuilder result = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();
+
+        for (String token : tokens) {
+
+            // Single letter
+            if (token.matches("[a-zA-Z]")) {
+                buffer.append(token);
+            }
+
+            // Full word
+            else if (token.matches("[a-zA-Z]+")) {
+
+                if (buffer.length() > 0) {
+                    result.append(buffer).append(" ");
+                    buffer.setLength(0);
+                }
+
+                result.append(token).append(" ");
+            }
+
+            // Punctuation
+            else if (token.equals(",") || token.equals(".")) {
+
+                if (buffer.length() > 0) {
+                    result.append(buffer);
+                    buffer.setLength(0);
+                }
+
+                // remove space before punctuation
+                int len = result.length();
+                if (len > 0 && result.charAt(len - 1) == ' ') {
+                    result.deleteCharAt(len - 1);
+                }
+
+                result.append(token).append(" ");
+            }
         }
 
-        // ✅ Step 5: Remove unwanted standalone "a"
-        cleaned = cleaned.replaceAll("\\b[aA]\\b", "").replaceAll("\\s+", " ").trim();
-
-        // Step 6: Fix punctuation spacing
-        cleaned = cleaned.replaceAll("\\s+,", ",");
-        cleaned = cleaned.replaceAll("\\s+\\.", ".");
-
-        // ✅ Step 7: Ensure proper ending "."
-        if (!cleaned.endsWith(".")) {
-            cleaned += ".";
+        // Flush buffer
+        if (buffer.length() > 0) {
+            result.append(buffer).append(" ");
         }
 
-        // Step 8: Capitalize
-        if (!cleaned.isEmpty()) {
-            cleaned = Character.toUpperCase(cleaned.charAt(0)) + cleaned.substring(1);
-        }
+        cleaned = result.toString().trim();
+
+        // Remove standalone "a"
+        cleaned = cleaned.replaceAll("\\b[aA]\\b", "")
+                .replaceAll("\\s+", " ")
+                .trim();
+
+        // Ensure single ending period
+        cleaned = cleaned.replaceAll("[,.]+$", "");
+        cleaned += ".";
+
+        // Capitalize
+        cleaned = Character.toUpperCase(cleaned.charAt(0)) + cleaned.substring(1);
 
         return cleaned;
     }
