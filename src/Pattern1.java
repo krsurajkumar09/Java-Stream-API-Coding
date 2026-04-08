@@ -244,8 +244,6 @@ public class Pattern1 {
                 ));
 
         System.out.println(freqMapping2);
-
-
     }
 
 }
