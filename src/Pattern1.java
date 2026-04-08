@@ -16,6 +16,8 @@ public class Pattern1 {
 
         String[] input3 = {"apple", "banana", "apple", "orange", "banana", "kiwi"};
 
+        String input4 = "orangebananafruit";
+
         // 🔥 STEP 1 — Create Frequency Map
         Map<String, Long> freqMap = list.stream()
                 .collect(Collectors.groupingBy(
@@ -60,7 +62,10 @@ public class Pattern1 {
                     if (obj instanceof Number n) return String.valueOf(n);
                     return obj; // required
                 })
-                .collect(Collectors.groupingBy( element -> element, LinkedHashMap::new, Collectors.counting()))
+                .collect(Collectors.groupingBy
+                        (element -> element,
+                                LinkedHashMap::new,
+                                Collectors.counting()))
                 .entrySet().stream()
                 .filter(entry -> entry.getValue() == 1)
                 .map(Map.Entry::getKey)
@@ -132,6 +137,115 @@ public class Pattern1 {
                 .orElse(null);
 
         System.out.println("First Non-Repeating Element: " + firstNonRepeating2);
+
+        // 🔥 QUESTION — 2nd Lowest Number & its Occurrence
+        List<Integer> numbers = Arrays.asList(10,10,34,45,10,9,9,10);
+
+//        int[] number = Arrays.asList(10,10,34,45,10,9,9,10);
+
+        // Step 1: Frequency Map (Sorted using TreeMap)
+        Map<Integer, Long> freq = numbers.stream()
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        TreeMap::new,
+                        Collectors.counting()
+                ));
+
+        System.out.println("Frequency Map (Sorted): " + freq);
+
+        // Step 2: Get 2nd lowest key
+        Integer secondLowest = freq.keySet().stream()
+                .skip(1)
+                .findFirst()
+                .orElse(null);
+
+        // Step 3: Get occurrence
+        long occurrence = secondLowest != null ? freq.get(secondLowest) : 0;
+
+
+//        Integer secondLowest = numbers.stream()
+//                .distinct()
+//                .sorted()
+//                .skip(1)
+//                .findFirst()
+//                .orElse(null);
+//
+//        long count = numbers.stream()
+//                .filter(n -> n.equals(secondLowest))
+//                .count();
+
+        System.out.println("Second Lowest Number: " + secondLowest);
+        System.out.println("Number of Occurrences: " + occurrence);
+
+//      If the input is primitive array
+
+        int[] numbers_ = {10,10,34,45,10,9,9,10};
+
+        // Step 1: Frequency Map (Sorted using TreeMap)
+        Map<Integer, Long> freq_ = Arrays.stream(numbers_)
+                .boxed() // 🔥 convert int -> Integer
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        TreeMap::new,
+                        Collectors.counting()
+                ));
+
+        System.out.println("Frequency Map (Sorted): " + freq);
+
+        // Step 2: Get 2nd lowest key
+        Integer secondLowest_ = freq_.keySet().stream()
+                .skip(1)
+                .findFirst()
+                .orElse(null);
+
+        // Step 3: Get occurrence
+        long occurrence_ = secondLowest != null ? freq.get(secondLowest_) : 0;
+
+        System.out.println("Second Lowest Number: " + secondLowest_);
+        System.out.println("Number of Occurrences: " + occurrence_);
+
+
+        // Count the frequency of String input /Character array input/ primitive array input
+
+        // a.Count the frequency of String input
+        String str = "aabccdeff";
+
+        Map<Character, Long> freqMapping = str.chars()   // IntStream
+                .mapToObj(c -> (char) c)            // convert int → char
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ));
+
+        System.out.println(freqMapping);
+
+        // b.Count the frequency of Character array input
+
+        Character[] arr = {'a','a','b','c','c','d'};
+
+        Map<Character, Long> freqMapping1 = Arrays.stream(arr)
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ));
+
+        System.out.println(freqMapping1);
+
+        // c.Count the frequency of character array input
+
+        char[] arr3 = {'a','a','b','c'};
+
+        Map<Character, Long> freqMapping2 = new String(arr3)  // convert to String
+                .chars()
+                .mapToObj(c -> (char) c)
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ));
+
+        System.out.println(freqMapping2);
+
+
     }
 
 }
